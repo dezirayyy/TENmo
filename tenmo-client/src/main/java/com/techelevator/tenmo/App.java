@@ -3,6 +3,7 @@ package com.techelevator.tenmo;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 import com.techelevator.tenmo.services.TransferService;
@@ -11,16 +12,19 @@ public class App {
 
     private static final String API_BASE_URL = "http://localhost:8080/";
 
-    private static final String API_BASE_URL_TRANSFER = "http://localhost:8080/transfer";
+    private static final String API_BASE_URL_TRANSFER = "http://localhost:8080/transfer/";
+
+    private static final String API_BASE_URL_ACCOUNT = "http://localhost:8080/account/";
 
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
 
     private final TransferService transferService = new TransferService(API_BASE_URL_TRANSFER);
 
+    private final AccountService accountService = new AccountService(API_BASE_URL_ACCOUNT);
+
     private AuthenticatedUser currentUser;
 
-    private Account account;
 
     public static void main(String[] args) {
         App app = new App();
@@ -65,6 +69,8 @@ public class App {
         currentUser = authenticationService.login(credentials);
         if (currentUser == null) {
             consoleService.printErrorMessage();
+        } else {
+            accountService.setAuthToken(currentUser.getToken());
         }
     }
 
@@ -95,7 +101,7 @@ public class App {
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
         consoleService.currentBalance();
-        System.out.println(account.getBalance()); // get current balance
+        System.out.println(accountService.viewBalance(currentUser.getUser().getId())); // get current balance
 	}
 
 	private void viewTransferHistory() {

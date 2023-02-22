@@ -97,16 +97,7 @@ public class JdbcUserDao implements UserDao {
         return true;
     }
 
-    @Override
-    public BigDecimal getBalance(int id) {
-        BigDecimal balance = null;
-        String sql = "SELECT balance FROM account WHERE user_id = ?";
-        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, id);
-        if (rowSet.next()) {
-            balance = mapRowToAccount(rowSet).getBalance();
-        }
-        return balance;
-    }
+
 
 
     private User mapRowToUser(SqlRowSet rs) {
@@ -119,11 +110,5 @@ public class JdbcUserDao implements UserDao {
         return user;
     }
 
-    private Account mapRowToAccount (SqlRowSet rs) {
-        Account account = new Account();
-        account.setAccount_id(rs.getInt("account_id"));
-        account.setUser_id(rs.getInt("user_id"));
-        account.setBalance(rs.getBigDecimal("balance"));
-        return account;
-    }
+
 }
