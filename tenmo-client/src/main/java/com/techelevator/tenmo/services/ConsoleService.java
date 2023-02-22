@@ -80,6 +80,10 @@ public class ConsoleService {
         }
     }
 
+    public void currentBalance(){
+        System.out.print("Your current balance is: " );
+    }
+
     public void pause() {
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();

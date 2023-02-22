@@ -86,7 +86,8 @@ public class App {
 
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
-		
+        consoleService.currentBalance();
+        System.out.println(); // get current balance
 	}
 
 	private void viewTransferHistory() {
