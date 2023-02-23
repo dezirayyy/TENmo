@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 
@@ -14,22 +16,11 @@ public class JdbcAccountDao implements AccountDao {
 
     private final JdbcTemplate jdbcTemplate;
 
+    //public JdbcAccountDao() {}
+
     public JdbcAccountDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
-//    @Override
-//    public BigDecimal viewBalance() {
-//        BigDecimal balance;
-//        try {
-//            balance = jdbcTemplate.queryForObject("SELECT balance FROM account WHERE id = ?;", BigDecimal.class, id);
-//        } catch (Exception e) {
-//            return BigDecimal.valueOf(0);
-//        }
-//        return balance;
-//    }
-
-
 
     @Override
     public Account get(int id) {
@@ -40,6 +31,20 @@ public class JdbcAccountDao implements AccountDao {
             account = mapRowToAccount(rowSet);
         }
         return account;
+    }
+
+    @Override
+    public List<Account> list(int id) {
+        List<Account> accountList = new ArrayList<>();
+        String sql = "SELECT user_id FROM account WHERE user_id != ?";
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, id);
+        while (rowSet.next()) {
+            Account account = mapRowToAccount(rowSet);
+            accountList.add(account);
+        }
+
+        return accountList;
+
     }
 
     private Account mapRowToAccount (SqlRowSet rs) {

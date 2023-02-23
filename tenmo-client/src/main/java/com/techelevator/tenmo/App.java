@@ -70,7 +70,7 @@ public class App {
         if (currentUser == null) {
             consoleService.printErrorMessage();
         } else {
-            accountService.setAuthToken(currentUser.getToken());
+            accountService.setCurrentUser(currentUser);
         }
     }
 
@@ -101,12 +101,12 @@ public class App {
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
         consoleService.currentBalance();
-        System.out.println(accountService.viewBalance(currentUser.getUser().getId())); // get current balance
+        System.out.print(accountService.viewBalance(currentUser.getUser().getId())); // get current balance
 	}
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void viewPendingRequests() {
@@ -116,7 +116,7 @@ public class App {
 
 	private void sendBucks() {
 		// TODO Auto-generated method stub
-		
+		accountService.listAllAccounts(currentUser.getUser().getId());
 	}
 
 	private void requestBucks() {

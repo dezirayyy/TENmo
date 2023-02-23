@@ -13,22 +13,37 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.List;
 
 public class AccountService {
 
     private final String baseUrl;
     private final RestTemplate restTemplate = new RestTemplate();
+    private AuthenticatedUser currentUser;
 
-    private String authToken = null;
-
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
+    public void setCurrentUser(AuthenticatedUser currentUser) {
+        this.currentUser = currentUser;
     }
-
     public AccountService(String url) {
         this.baseUrl = url;
     }
 
+    public List<Account> listAllAccounts(int id){
+        List<Account> accountList = null;
+        try {
+            ResponseEntity<List> response =
+                    restTemplate.exchange(baseUrl + "list/" + id, HttpMethod.GET, makeAuthEntity(), List.class);
+            accountList = response.getBody();
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+
+        if (accountList == null){
+            throw new NullPointerException("No Accounts Found");
+        } else {
+            return accountList;
+        }
+    }
 
 
     public BigDecimal viewBalance(int id){
@@ -51,7 +66,7 @@ public class AccountService {
     private HttpEntity<Account> makeAccountEntity(Account account) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(authToken);
+        headers.setBearerAuth(currentUser.getToken());
         return new HttpEntity<>(account, headers);
     }
 
@@ -59,7 +74,7 @@ public class AccountService {
 
     private HttpEntity<Void> makeAuthEntity() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(authToken);
+        headers.setBearerAuth(currentUser.getToken());
         return new HttpEntity<>(headers);
     }
 }
