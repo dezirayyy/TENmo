@@ -1,12 +1,14 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 import com.techelevator.tenmo.services.TransferService;
+
+import java.math.BigDecimal;
 
 public class App {
 
@@ -71,6 +73,7 @@ public class App {
             consoleService.printErrorMessage();
         } else {
             accountService.setCurrentUser(currentUser);
+            transferService.setCurrentUser(currentUser);
         }
     }
 
@@ -89,6 +92,8 @@ public class App {
                 sendBucks();
             } else if (menuSelection == 5) {
                 requestBucks();
+            } else if (menuSelection == 6) {
+                listUsers();
             } else if (menuSelection == 0) {
                 continue;
             } else {
@@ -101,8 +106,16 @@ public class App {
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
         consoleService.currentBalance();
-        System.out.print(accountService.viewBalance(currentUser.getUser().getId())); // get current balance
+        System.out.print(accountService.getBalance(currentUser.getUser().getId()));
 	}
+
+    private void listUsers(){
+        consoleService.listAccounts();
+        User[] userList = accountService.listUsers(currentUser.getUser().getId());
+        for (User user : userList) {
+            System.out.println(user.getId() + "   " + user.getUsername());
+        }
+    }
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
@@ -116,8 +129,14 @@ public class App {
 
 	private void sendBucks() {
 		// TODO Auto-generated method stub
-		accountService.listAllAccounts(currentUser.getUser().getId());
-	}
+        listUsers();
+        System.out.println();
+        int user = consoleService.promptForUserInfo();
+        BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
+        System.out.println(transferService.sendBucks(user, amount));
+        System.out.println("You've successfully sent " + amount);
+
+    }
 
 	private void requestBucks() {
 		// TODO Auto-generated method stub

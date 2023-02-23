@@ -56,10 +56,5 @@ public class AuthenticationController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User registration failed.");
         }
     }
-
-    @RequestMapping(value = "/viewBalance", method = RequestMethod.GET)
-    public void viewBalance(@Valid @RequestBody Account account){
-
-    }
 }
 

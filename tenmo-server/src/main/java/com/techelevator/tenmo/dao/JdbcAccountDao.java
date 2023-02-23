@@ -1,22 +1,21 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Max;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-
 public class JdbcAccountDao implements AccountDao {
 
     private final JdbcTemplate jdbcTemplate;
-
-    //public JdbcAccountDao() {}
 
     public JdbcAccountDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -34,20 +33,26 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public List<Account> list(int id) {
-        List<Account> accountList = new ArrayList<>();
-        String sql = "SELECT user_id FROM account WHERE user_id != ?";
+    public List<User> listUsers(int id) {
+        List<User> userList = new ArrayList<>();
+        String sql = "SELECT user_id, username FROM tenmo_user WHERE user_id != ?";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, id);
         while (rowSet.next()) {
-            Account account = mapRowToAccount(rowSet);
-            accountList.add(account);
+            User account = mapRowToUser(rowSet);
+            userList.add(account);
         }
-
-        return accountList;
-
+        return userList;
     }
 
-    private Account mapRowToAccount (SqlRowSet rs) {
+    private User mapRowToUser(SqlRowSet rs) {
+        User user = new User();
+        user.setId(rs.getInt("user_id"));
+        user.setActivated(true);
+        user.setUsername(rs.getString("username"));
+        return user;
+    }
+
+    private Account mapRowToAccount(SqlRowSet rs) {
         Account account = new Account();
         account.setAccount_id(rs.getInt("account_id"));
         account.setUser_id(rs.getInt("user_id"));

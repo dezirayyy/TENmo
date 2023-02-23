@@ -3,17 +3,14 @@ package com.techelevator.tenmo.services;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.security.Principal;
-import java.util.List;
 
 public class AccountService {
 
@@ -28,25 +25,27 @@ public class AccountService {
         this.baseUrl = url;
     }
 
-    public List<Account> listAllAccounts(int id){
-        List<Account> accountList = null;
+    // returns a list of user ids and usernames, not including the current user
+
+    public User[] listUsers(int id){
+        User[] userList = new User[]{};
         try {
-            ResponseEntity<List> response =
-                    restTemplate.exchange(baseUrl + "list/" + id, HttpMethod.GET, makeAuthEntity(), List.class);
-            accountList = response.getBody();
+            ResponseEntity<User[]> response =
+                    restTemplate.exchange(baseUrl + "list/" + id, HttpMethod.GET, makeAuthEntity(), User[].class);
+            userList = response.getBody();
         } catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());
         }
-
-        if (accountList == null){
-            throw new NullPointerException("No Accounts Found");
+        if (userList == null) {
+            throw new NullPointerException("No Accounts found");
         } else {
-            return accountList;
+            return userList;
         }
     }
 
 
-    public BigDecimal viewBalance(int id){
+    // gets the balance of the current user
+    public BigDecimal getBalance(int id){
         Account account = null;
         try {
             ResponseEntity<Account> response = restTemplate.exchange(baseUrl + id, HttpMethod.GET, makeAuthEntity(), Account.class);

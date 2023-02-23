@@ -1,7 +1,6 @@
 package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.AccountDao;
-import com.techelevator.tenmo.dao.JdbcAccountDao;
 import com.techelevator.tenmo.dao.UserDao;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.User;
@@ -9,21 +8,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.math.BigDecimal;
-import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/account")
+@RequestMapping("/account/")
 public class AccountController {
 
     private AccountDao dao;
 
-    public AccountController(AccountDao accountDao) {
+    private UserDao user;
+
+    public AccountController(AccountDao accountDao, UserDao user) {
         this.dao = accountDao;
+        this.user = user;
     }
 
-    @RequestMapping (path = "/{id}", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping (path = "{id}", method = RequestMethod.GET)
     public Account get(@PathVariable int id){
         Account account = dao.get(id);
         if (account == null) {
@@ -33,13 +34,14 @@ public class AccountController {
         }
     }
 
-    @RequestMapping (path = "/list/{id}", method = RequestMethod.GET)
-    public List<Account> list (@PathVariable int id){
-        List<Account> accountList = dao.list(id);
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping (path = "list/{id}", method = RequestMethod.GET)
+    public User[] list (@PathVariable int id){
+        List<User> accountList = dao.listUsers(id);
         if (accountList == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Not Found");
         } else {
-            return accountList;
+            return accountList.toArray(new User[accountList.size()]);
         }
     }
 

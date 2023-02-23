@@ -42,7 +42,7 @@ public class ConsoleService {
         System.out.println("3: View your pending requests");
         System.out.println("4: Send TE bucks");
         System.out.println("5: Request TE bucks");
-        System.out.println("6: Logout");
+        System.out.println("6: List users");
         System.out.println("0: Exit");
         System.out.println();
     }
@@ -80,8 +80,27 @@ public class ConsoleService {
         }
     }
 
+    public int promptForUserInfo(){
+        System.out.println("Enter ID of user you are sending to (0 to cancel):");
+        while (true) {
+            try {
+                return scanner.nextInt();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+    }
+
     public void currentBalance(){
         System.out.print("Your current balance is: " );
+    }
+
+    public void listAccounts() {
+        System.out.println("-------------------------------------------");
+        System.out.println("Users");
+        System.out.println();
+        System.out.println("ID      Name");
+        System.out.println("-------------------------------------------");
     }
 
     public void pause() {
