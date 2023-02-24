@@ -21,61 +21,59 @@ public class TransferService {
     public void setCurrentUser(AuthenticatedUser currentUser) {
         this.currentUser = currentUser;
     }
+
     public TransferService(String url) {
         this.baseUrl = url;
     }
 
-    public void sendBucks(int id, BigDecimal amount){
-        Account toAccount =  getAccount(id);
-        Account fromAccount = getAccount(currentUser.getUser().getId());
-
-        if (id == 0)
-        if (fromAccount.getUser_id() == id) {
-            throw new IllegalArgumentException("Cannot send bucks to yourself");
-        }
+    public boolean sendBucks(int id, BigDecimal amount) {
+        Account toAccount = getAccountByUserId(id);
+        Account fromAccount = getAccountByUserId(currentUser.getUser().getId());
 
         boolean sufficientFunds = false;
         int result = fromAccount.getBalance().compareTo(amount);
-        if (result > -1) {
-             sufficientFunds = true;
+        if (result < 1) {
+            return sufficientFunds;
         } else {
-            throw new IllegalStateException("Account does not have sufficient funds");
-        }
+            Transfer transfer = new Transfer();
+            transfer.setAmount(amount);
+            transfer.setAccount_from(fromAccount.getAccount_id());
+            transfer.setAccount_to(toAccount.getAccount_id());
+            transfer.setTransfer_type_id(2);
+            transfer.setTransfer_status_id(2);
 
-        Transfer currentTransfer = new Transfer();
-        currentTransfer.setAmount(amount);
-        currentTransfer.setAccount_from(fromAccount.getAccount_id());
-        currentTransfer.setAccount_to(toAccount.getAccount_id());
-        currentTransfer.setTransfer_type_id(2);
-        currentTransfer.setTransfer_status_id(2);
 
-        if (sufficientFunds) {
             try {
-                HttpEntity<Transfer> entity = makeTransferEntity(currentTransfer);
-                ResponseEntity<Transfer> response =  restTemplate.exchange(baseUrl + "/send", HttpMethod.POST, entity, Transfer.class);
-                currentTransfer = response.getBody();
+                HttpEntity<Transfer> entity = makeTransferEntity(transfer);
+                ResponseEntity<Transfer> response = restTemplate.exchange(baseUrl + "/send", HttpMethod.POST, entity, Transfer.class);
+                transfer = response.getBody();
             } catch (RestClientResponseException | ResourceAccessException e) {
                 BasicLogger.log(e.getMessage());
             }
+            return sufficientFunds = true;
         }
     }
 
-    public Transfer[] viewTransferHistory(int id) {
-        Transfer[] transferList = new Transfer[]{};
-        try {
-            ResponseEntity<Transfer[]> response =
-                    restTemplate.exchange(baseUrl +"/"+ id + "/history", HttpMethod.GET, makeAuthEntity(), Transfer[].class);
-            transferList = response.getBody();
-        } catch (RestClientResponseException | ResourceAccessException e) {
-            BasicLogger.log(e.getMessage());
-        }
-        if (transferList == null) {
-            throw new NullPointerException("No Transfers found");
-        } else {
-            return transferList;
+//    public void requestBucks(int id, BigDecimal amount) {
+//
+//    }
+
+        public Transfer[] viewTransferHistory ( int id){
+            Transfer[] transferList = new Transfer[]{};
+            try {
+                ResponseEntity<Transfer[]> response =
+                        restTemplate.exchange(baseUrl + "/" + id + "/history", HttpMethod.GET, makeAuthEntity(), Transfer[].class);
+                transferList = response.getBody();
+            } catch (RestClientResponseException | ResourceAccessException e) {
+                BasicLogger.log(e.getMessage());
+            }
+            if (transferList == null) {
+                throw new NullPointerException("No Transfers found");
+            } else {
+                return transferList;
+            }
         }
 
-    }
 
     public Transfer viewTransferDetails(int id){
         Transfer transfer = new Transfer(){};
@@ -93,11 +91,10 @@ public class TransferService {
         }
     }
 
-    public Account getAccount(int id){
+    public Account getAccountByUserId(int id){
         Account account = null;
         try {
-            ResponseEntity<Account> response =
-                    restTemplate.exchange(baseUrl + id,HttpMethod.GET, makeAuthEntity(), Account.class);
+            ResponseEntity<Account> response = restTemplate.exchange(baseUrl + id, HttpMethod.GET, makeAuthEntity(), Account.class);
             account = response.getBody();
         } catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());

@@ -28,7 +28,7 @@ public class Transfer {
         return transfer_type_id;
     }
 
-    public String getTransferType(int id) {
+    public String getTransferTypeString(int id) {
         if (id == 1){
             return "Request";
         } else {
@@ -44,7 +44,7 @@ public class Transfer {
         return transfer_status_id;
     }
 
-    public String getTransferStatus(int id){
+    public String getTransferStatusString(int id){
         if (id == 1){
             return "Pending";
         } else if (id == 2){

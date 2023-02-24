@@ -80,8 +80,21 @@ public class ConsoleService {
         }
     }
 
-    public int promptForUserInfo(){
-        System.out.println("Enter ID of user you are sending to/ requesting from:");
+    public int promptForUserSend(){
+        System.out.println("Enter ID of user you are sending to (0 to cancel):");
+
+        while (true) {
+            try {
+                return scanner.nextInt();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+    }
+
+    public int promptForUserRequest() {
+        System.out.println("Enter ID of user you are requesting to (0 to cancel):");
+
         while (true) {
             try {
                 return scanner.nextInt();

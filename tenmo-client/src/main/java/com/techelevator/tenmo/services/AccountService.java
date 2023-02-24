@@ -5,12 +5,9 @@ import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-
-import java.math.BigDecimal;
 
 public class AccountService {
 
@@ -25,10 +22,26 @@ public class AccountService {
         this.baseUrl = url;
     }
 
-    // returns a list of user ids and usernames, not including the current user
+    // gets user by account id
+    public User getUserByAccountId(int id){
+        User user = null;
+        try {
+            ResponseEntity<User> response =
+                    restTemplate.exchange(baseUrl + "user/" + id, HttpMethod.GET, makeAuthEntity(), User.class);
+            user = response.getBody();
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        if (user == null) {
+            throw new NullPointerException("No User found");
+        } else {
+            return user;
+        }
+    }
 
+    // returns a list of user ids and usernames, not including the current user
     public User[] listUsers(int id){
-        User[] userList = new User[]{};
+        User[] userList = null;
         try {
             ResponseEntity<User[]> response =
                     restTemplate.exchange(baseUrl + "list/" + id, HttpMethod.GET, makeAuthEntity(), User[].class);
@@ -43,9 +56,8 @@ public class AccountService {
         }
     }
 
-
-    // gets the balance of the current user
-    public BigDecimal getBalance(int id){
+    // gets account by user ud
+    public Account getAccountByUserId(int id){
         Account account = null;
         try {
             ResponseEntity<Account> response = restTemplate.exchange(baseUrl + id, HttpMethod.GET, makeAuthEntity(), Account.class);
@@ -56,20 +68,9 @@ public class AccountService {
         if (account == null) {
             throw new NullPointerException("Account Not Found");
         } else {
-            return account.getBalance();
+            return account;
         }
     }
-
-
-
-    private HttpEntity<Account> makeAccountEntity(Account account) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(currentUser.getToken());
-        return new HttpEntity<>(account, headers);
-    }
-
-
 
     private HttpEntity<Void> makeAuthEntity() {
         HttpHeaders headers = new HttpHeaders();

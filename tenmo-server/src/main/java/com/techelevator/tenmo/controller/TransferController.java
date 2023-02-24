@@ -26,7 +26,7 @@ public class TransferController {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public Account getAccount(@PathVariable int id) {
-        Account account = dao.get(id);
+        Account account = dao.getAccount(id);
         if (account == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Not Found");
         } else {

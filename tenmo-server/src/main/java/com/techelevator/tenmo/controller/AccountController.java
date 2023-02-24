@@ -25,12 +25,23 @@ public class AccountController {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping (path = "/{id}", method = RequestMethod.GET)
-    public Account get(@PathVariable int id){
-        Account account = dao.get(id);
+    public Account getAccount(@PathVariable int id){
+        Account account = dao.getAccount(id);
         if (account == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Not Found");
         } else {
             return account;
+        }
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(path = "/user/{id}", method = RequestMethod.GET)
+    public User getUser(@PathVariable int id) {
+        User user = dao.getUser(id);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
+        } else {
+            return user;
         }
     }
 

@@ -102,59 +102,76 @@ public class App {
     }
 
 	private void viewCurrentBalance() {
-		// TODO Auto-generated method stub
         consoleService.currentBalance();
-        System.out.print(accountService.getBalance(currentUser.getUser().getId()));
+        System.out.print(accountService.getAccountByUserId(currentUser.getUser().getId()).getBalance());
 	}
 
-	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
-        Account account = transferService.getAccount(currentUser.getUser().getId());
+    private void viewTransferHistory() {
+        Account account = accountService.getAccountByUserId(currentUser.getUser().getId());
         Transfer[] transferHistory = transferService.viewTransferHistory(account.getAccount_id());
         consoleService.transferHistory();
-
         for (Transfer transfer: transferHistory) {
-            if (transfer.getAccount_from() == account.getAccount_id()){
-
-                System.out.println(transfer.getTransfer_id()+"            To: "+transfer.getAccount_to()+"            $"+transfer.getAmount());
-            } else {
-                System.out.println(transfer.getTransfer_id()+"            From: "+ transfer.getAccount_from()+"          $"+transfer.getAmount());
-            }
+            String fromOrTo = transfer.getAccount_from() == account.getAccount_id() ? "To: " : "From: ";
+            String username = accountService.getUserByAccountId(fromOrTo.equals("To: ") ? transfer.getAccount_to() : transfer.getAccount_from()).getUsername();
+            System.out.println(transfer.getTransfer_id() + "            " + fromOrTo + username + "            $" + transfer.getAmount());
         }
+
         int id = consoleService.promptForInt("Please enter transfer ID to view details: ");
         Transfer transfer = transferService.viewTransferDetails(id);
         consoleService.transferDetails();
-        System.out.println("ID: "+transfer.getTransfer_id());
-        System.out.println("From: "+transfer.getAccount_from());
-        System.out.println("To: "+transfer.getAccount_to());
-        System.out.println("Type: "+transfer.getTransferType(transfer.getTransfer_type_id()));
-        System.out.println("Status: "+transfer.getTransferStatus(transfer.getTransfer_status_id()));
-        System.out.println("Amount: "+transfer.getAmount());
+        String transferType = transfer.getTransferTypeString(transfer.getTransfer_type_id());
+        String transferStatus = transfer.getTransferStatusString(transfer.getTransfer_status_id());
+        System.out.println("ID: " + transfer.getTransfer_id());
+        System.out.println("From: " + accountService.getUserByAccountId(transfer.getAccount_from()).getUsername());
+        System.out.println("To: " + accountService.getUserByAccountId(transfer.getAccount_to()).getUsername());
+        System.out.println("Type: " + transferType);
+        System.out.println("Status: " + transferStatus);
+        System.out.println("Amount: " + transfer.getAmount());
+    }
 
-	}
 
-	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
-		
+    private void viewPendingRequests() {
+
 	}
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
         listUsers();
-        System.out.println();
-        int user = consoleService.promptForUserInfo();
-        BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
-        transferService.sendBucks(user, amount);
-        System.out.println("You've successfully sent " + amount);
-
+        int user = consoleService.promptForUserSend();
+        if (user == 0) {
+            System.out.println("Transfer Cancelled");
+        } else if (user == currentUser.getUser().getId()) {
+            System.out.println("Can't send bucks to yourself");
+        } else {
+            BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
+            if (amount.compareTo(BigDecimal.ZERO) < 0) {
+                System.out.println("Can't send negative or zero amount");
+            } else {
+                if (transferService.sendBucks(user, amount)) {
+                    System.out.println("Transfer successful: " + amount + " bucks sent to user: " + user);
+                } else {
+                    System.out.println("Insufficient funds");
+                }
+            }
+        }
     }
 
 	private void requestBucks() {
-		// TODO Auto-generated method stub
 		listUsers();
         System.out.println();
-        int user = consoleService.promptForUserInfo();
-        BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
+        int user = consoleService.promptForUserRequest();
+        if (user == 0) {
+            System.out.println("Transfer Cancelled");
+        } else if (user == currentUser.getUser().getId()) {
+            System.out.println("Can't request bucks from yourself");
+        } else {
+            BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
+            if (amount.compareTo(BigDecimal.ZERO) < 0) {
+                System.out.println("Can't send negative or zero amount");
+            } else {
+                // transferService.requestBucks(int user, BigDecimal amount);
+                System.out.println("Requested " + amount + " bucks from  user: " + user);
+            }
+        }
 	}
 
     private void listUsers(){

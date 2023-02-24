@@ -23,14 +23,28 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public Account get(int id) {
+    public Account getAccount(int id) {
         Account account = null;
-        String sql = "SELECT * FROM account WHERE user_id = ?";
+        String sql = "SELECT * FROM account " +
+                "WHERE user_id = ?";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, id);
         if (rowSet.next()) {
             account = mapRowToAccount(rowSet);
         }
         return account;
+    }
+
+    @Override
+    public User getUser(int id) {
+        User user = null;
+        String sql = "SELECT t.user_id, t.username FROM tenmo_user t " +
+                "JOIN account a ON a.user_id = t.user_id " +
+                "WHERE a.account_id = ?;";
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, id);
+        if (rowSet.next()){
+            user = mapRowToUser(rowSet);
+        }
+        return user;
     }
 
     @Override
