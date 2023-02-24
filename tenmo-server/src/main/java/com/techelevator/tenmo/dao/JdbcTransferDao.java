@@ -1,7 +1,6 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -19,7 +18,7 @@ public class JdbcTransferDao implements TransferDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public boolean sendBucks(Transfer transfer) {
+    public boolean save(Transfer transfer) {
         String sql =
                 "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
                         "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id;";
@@ -34,8 +33,20 @@ public class JdbcTransferDao implements TransferDao {
 
     public List<Transfer> listTransfers(int id) {
         List<Transfer> list = new ArrayList<>();
-        String sql = "SELECT * FROM transfer WHERE account_from = ? OR account_to = ?; ";
+        String sql = "SELECT * FROM transfer WHERE transfer_status_id = 2 AND (account_from = ? OR account_to = ?);";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, id, id);
+        while (rowSet.next()){
+            Transfer transfer = mapRowToTransfer(rowSet);
+            list.add(transfer);
+        }
+        return list;
+    }
+
+    @Override
+    public List<Transfer> pendingTransfers(int id) {
+        List<Transfer> list = new ArrayList<>();
+        String sql = "SELECT * FROM transfer WHERE transfer_status_id = 1 AND account_from = ?;";
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, id);
         while (rowSet.next()){
             Transfer transfer = mapRowToTransfer(rowSet);
             list.add(transfer);

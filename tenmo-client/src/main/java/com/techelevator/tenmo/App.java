@@ -113,7 +113,7 @@ public class App {
         for (Transfer transfer: transferHistory) {
             String fromOrTo = transfer.getAccount_from() == account.getAccount_id() ? "To: " : "From: ";
             String username = accountService.getUserByAccountId(fromOrTo.equals("To: ") ? transfer.getAccount_to() : transfer.getAccount_from()).getUsername();
-            System.out.println(transfer.getTransfer_id() + "            " + fromOrTo + username + "            $" + transfer.getAmount());
+            System.out.println(transfer.getTransfer_id() + "            " + fromOrTo + username + "              $" + transfer.getAmount());
         }
 
         int id = consoleService.promptForInt("Please enter transfer ID to view details: ");
@@ -131,8 +131,16 @@ public class App {
 
 
     private void viewPendingRequests() {
+        Account account = accountService.getAccountByUserId(currentUser.getUser().getId());
+        Transfer[] transferHistory = transferService.viewPendingTransfer(account.getAccount_id());
+        consoleService.pendingTransfer();
+        for (Transfer transfer: transferHistory) {
+            String fromOrTo = transfer.getAccount_from() == account.getAccount_id() ? "To: " : "From: ";
+            String username = accountService.getUserByAccountId(fromOrTo.equals("To: ") ? transfer.getAccount_to() : transfer.getAccount_from()).getUsername();
+            System.out.println(transfer.getTransfer_id() + "            " + fromOrTo + username + "              $" + transfer.getAmount());
+        }
 
-	}
+    }
 
 	private void sendBucks() {
         listUsers();
@@ -168,7 +176,7 @@ public class App {
             if (amount.compareTo(BigDecimal.ZERO) < 0) {
                 System.out.println("Can't send negative or zero amount");
             } else {
-                // transferService.requestBucks(int user, BigDecimal amount);
+                transferService.requestBucks(user, amount);
                 System.out.println("Requested " + amount + " bucks from  user: " + user);
             }
         }

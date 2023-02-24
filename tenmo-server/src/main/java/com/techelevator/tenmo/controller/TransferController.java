@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -37,10 +38,31 @@ public class TransferController {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "/send", method = RequestMethod.POST)
     public void sendBucks(@Valid @RequestBody Transfer transfer) {
-        if(!currentTransfer.sendBucks(transfer)){
+        if(!currentTransfer.save(transfer)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Transfer failed");
         }
         dao.updateBalances(transfer.getAccount_to(), transfer.getAccount_from(),transfer.getAmount(),transfer.getAmount());
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @RequestMapping(path = "/request", method = RequestMethod.POST)
+    public void requestBucks(@Valid @RequestBody Transfer transfer) {
+        if(!currentTransfer.save(transfer)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Request failed");
+        }
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @RequestMapping(path = "/request/response", method = RequestMethod.POST)
+    public void requestResponse(@Valid @RequestBody Transfer transfer){
+        if (transfer.getTransfer_status_id() == 2){
+            dao.updateBalances(transfer.getAccount_to(), transfer.getAccount_from(),transfer.getAmount(),transfer.getAmount());
+            transfer.setTransfer_status_id(2);
+            currentTransfer.save(transfer);
+        } else {
+            transfer.setTransfer_status_id(3);
+            currentTransfer.save(transfer);
+        }
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -57,11 +79,22 @@ public class TransferController {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(path = "/details/{id}", method = RequestMethod.GET)
     public Transfer viewTransferDetails(@PathVariable int id){
-        Transfer transfer = currentTransfer.getTransfer(id);
+        Transfer transfer = this.currentTransfer.getTransfer(id);
         if (transfer == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transfer Not Found");
         } else {
             return transfer;
+        }
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(path = "/{id}/pending", method = RequestMethod.GET)
+    public Transfer[] pendingTransfers(@PathVariable int id){
+        List<Transfer> list = currentTransfer.pendingTransfers(id);
+        if (list == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transfers Not Found");
+        } else {
+            return list.toArray(new Transfer[list.size()]);
         }
     }
 }

@@ -6,9 +6,11 @@ import java.util.List;
 
 public interface TransferDao {
 
-    public boolean sendBucks(Transfer transfer);
+    public boolean save(Transfer transfer);
 
     public List<Transfer> listTransfers(int id);
 
-    public Transfer getTransfer(int id);
+    public List<Transfer> pendingTransfers(int id);
+
+    Transfer getTransfer(int id);
 }

@@ -42,7 +42,6 @@ public class TransferService {
             transfer.setTransfer_type_id(2);
             transfer.setTransfer_status_id(2);
 
-
             try {
                 HttpEntity<Transfer> entity = makeTransferEntity(transfer);
                 ResponseEntity<Transfer> response = restTemplate.exchange(baseUrl + "/send", HttpMethod.POST, entity, Transfer.class);
@@ -54,11 +53,28 @@ public class TransferService {
         }
     }
 
-//    public void requestBucks(int id, BigDecimal amount) {
-//
-//    }
+    public void requestBucks(int id, BigDecimal amount) {
+        Account fromAccount = getAccountByUserId(id);
+        Account toAccount = getAccountByUserId(currentUser.getUser().getId());
 
-        public Transfer[] viewTransferHistory ( int id){
+
+            Transfer transfer = new Transfer();
+            transfer.setAmount(amount);
+            transfer.setAccount_from(fromAccount.getAccount_id());
+            transfer.setAccount_to(toAccount.getAccount_id());
+            transfer.setTransfer_type_id(1);
+            transfer.setTransfer_status_id(1);
+
+            try {
+                HttpEntity<Transfer> entity = makeTransferEntity(transfer);
+                ResponseEntity<Transfer> response = restTemplate.exchange(baseUrl + "/request"  , HttpMethod.POST, entity, Transfer.class);
+                transfer = response.getBody();
+            } catch (RestClientResponseException | ResourceAccessException e) {
+                BasicLogger.log(e.getMessage());
+            }
+    }
+
+        public Transfer[] viewTransferHistory (int id){
             Transfer[] transferList = new Transfer[]{};
             try {
                 ResponseEntity<Transfer[]> response =
@@ -73,6 +89,23 @@ public class TransferService {
                 return transferList;
             }
         }
+
+        public Transfer[] viewPendingTransfer(int id) {
+            Transfer[] pendingTransfers = new Transfer[]{};
+            try {
+                ResponseEntity<Transfer[]> response =
+                        restTemplate.exchange(baseUrl + "/" + id + "/pending", HttpMethod.GET, makeAuthEntity(), Transfer[].class);
+                pendingTransfers = response.getBody();
+            } catch (RestClientResponseException | ResourceAccessException e) {
+                BasicLogger.log(e.getMessage());
+            }
+            if (pendingTransfers == null) {
+                throw new NullPointerException("No Transfers found");
+            } else {
+                return pendingTransfers;
+            }
+        }
+
 
 
     public Transfer viewTransferDetails(int id){

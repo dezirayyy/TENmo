@@ -129,6 +129,13 @@ public class ConsoleService {
         System.out.println("-------------------------------------------");
     }
 
+    public void pendingTransfer(){
+        System.out.println("-------------------------------------------");
+        System.out.println("Pending Transfers");
+        System.out.println("ID                  To             Amount");
+        System.out.println("-------------------------------------------");
+    }
+
     public void pause() {
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
