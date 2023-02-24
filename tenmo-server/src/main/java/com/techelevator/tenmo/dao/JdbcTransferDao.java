@@ -54,6 +54,15 @@ public class JdbcTransferDao implements TransferDao {
         return list;
     }
 
+    public void approveOrReject(int id, int action){
+        String sql = "UPDATE transfer SET transfer_status_id = ? WHERE transfer_id = ?;";
+        try {
+            jdbcTemplate.update(sql, action, id);
+        } catch (DataAccessException e) {
+           throw new IllegalStateException("no");
+        }
+    }
+
     @Override
     public Transfer getTransfer(int id) {
         Transfer transfer = new Transfer();

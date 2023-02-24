@@ -15,7 +15,7 @@ public interface AccountDao {
 
     public List<User> listUsers(int id);
 
-    public boolean updateBalances(int toId, int fromId, BigDecimal amountTo, BigDecimal amountFrom);
+    public void updateBalances(int toId, int fromId, BigDecimal amountTo, BigDecimal amountFrom);
 
 
 

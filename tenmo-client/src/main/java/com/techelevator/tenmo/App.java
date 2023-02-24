@@ -115,18 +115,22 @@ public class App {
             String username = accountService.getUserByAccountId(fromOrTo.equals("To: ") ? transfer.getAccount_to() : transfer.getAccount_from()).getUsername();
             System.out.println(transfer.getTransfer_id() + "            " + fromOrTo + username + "              $" + transfer.getAmount());
         }
-
-        int id = consoleService.promptForInt("Please enter transfer ID to view details: ");
-        Transfer transfer = transferService.viewTransferDetails(id);
-        consoleService.transferDetails();
-        String transferType = transfer.getTransferTypeString(transfer.getTransfer_type_id());
-        String transferStatus = transfer.getTransferStatusString(transfer.getTransfer_status_id());
-        System.out.println("ID: " + transfer.getTransfer_id());
-        System.out.println("From: " + accountService.getUserByAccountId(transfer.getAccount_from()).getUsername());
-        System.out.println("To: " + accountService.getUserByAccountId(transfer.getAccount_to()).getUsername());
-        System.out.println("Type: " + transferType);
-        System.out.println("Status: " + transferStatus);
-        System.out.println("Amount: " + transfer.getAmount());
+        System.out.println();
+        int id = consoleService.promptForInt("Please enter transfer ID to view details (0 to cancel): ");
+        if (id == 0) {
+            System.out.println("Action Cancelled");
+        } else {
+            Transfer transfer = transferService.viewTransferDetails(id);
+            consoleService.transferDetails();
+            String transferType = transfer.getTransferTypeString(transfer.getTransfer_type_id());
+            String transferStatus = transfer.getTransferStatusString(transfer.getTransfer_status_id());
+            System.out.println("ID: " + transfer.getTransfer_id());
+            System.out.println("From: " + accountService.getUserByAccountId(transfer.getAccount_from()).getUsername());
+            System.out.println("To: " + accountService.getUserByAccountId(transfer.getAccount_to()).getUsername());
+            System.out.println("Type: " + transferType);
+            System.out.println("Status: " + transferStatus);
+            System.out.println("Amount: " + transfer.getAmount());
+        }
     }
 
 
@@ -139,7 +143,20 @@ public class App {
             String username = accountService.getUserByAccountId(fromOrTo.equals("To: ") ? transfer.getAccount_to() : transfer.getAccount_from()).getUsername();
             System.out.println(transfer.getTransfer_id() + "            " + fromOrTo + username + "              $" + transfer.getAmount());
         }
-
+        System.out.println();
+        int id = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
+        if (id == 0) {
+            System.out.println("Action Cancelled");
+        } else {
+            consoleService.approveOrRejectTransfer();
+            int action = consoleService.promptForInt("Please choose an option: ");
+            transferService.approveOrReject(id, action);
+            if (action == 2) {
+                System.out.println("You've approved the request. Amount has been sent");
+            } else {
+                System.out.println("You've rejected the request.");
+            }
+        }
     }
 
 	private void sendBucks() {
@@ -155,7 +172,7 @@ public class App {
                 System.out.println("Can't send negative or zero amount");
             } else {
                 if (transferService.sendBucks(user, amount)) {
-                    System.out.println("Transfer successful: " + amount + " bucks sent to user: " + user);
+                    System.out.println("Transfer successful: " + amount + " bucks sent to: " + accountService.getUserByAccountId(accountService.getAccountByUserId(user).getAccount_id()).getUsername());
                 } else {
                     System.out.println("Insufficient funds");
                 }
@@ -177,7 +194,7 @@ public class App {
                 System.out.println("Can't send negative or zero amount");
             } else {
                 transferService.requestBucks(user, amount);
-                System.out.println("Requested " + amount + " bucks from  user: " + user);
+                System.out.println("Requested " + amount + " bucks from: " + accountService.getUserByAccountId(accountService.getAccountByUserId(user).getAccount_id()).getUsername());
             }
         }
 	}

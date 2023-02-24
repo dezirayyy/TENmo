@@ -59,15 +59,14 @@ public class JdbcAccountDao implements AccountDao {
         return userList;
     }
 
-    public boolean updateBalances(int toId, int fromId, BigDecimal amountTo, BigDecimal amountFrom) {
+    public void updateBalances(int toId, int fromId, BigDecimal amountTo, BigDecimal amountFrom) {
         String sql = "UPDATE account SET balance = balance + ? WHERE account_id = ?; " +
                 "UPDATE account SET balance = balance - ? WHERE account_id = ?";
         try {
             jdbcTemplate.update(sql, amountTo, toId, amountFrom, fromId);
         } catch (DataAccessException e) {
-            return false;
+            throw new IllegalStateException("no");
         }
-        return true;
     }
 
 

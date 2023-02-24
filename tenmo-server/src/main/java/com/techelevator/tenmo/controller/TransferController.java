@@ -41,7 +41,6 @@ public class TransferController {
         if(!currentTransfer.save(transfer)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Transfer failed");
         }
-        dao.updateBalances(transfer.getAccount_to(), transfer.getAccount_from(),transfer.getAmount(),transfer.getAmount());
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -79,7 +78,7 @@ public class TransferController {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(path = "/details/{id}", method = RequestMethod.GET)
     public Transfer viewTransferDetails(@PathVariable int id){
-        Transfer transfer = this.currentTransfer.getTransfer(id);
+        Transfer transfer = currentTransfer.getTransfer(id);
         if (transfer == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transfer Not Found");
         } else {
@@ -95,6 +94,18 @@ public class TransferController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transfers Not Found");
         } else {
             return list.toArray(new Transfer[list.size()]);
+        }
+    }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @RequestMapping(path = "/{id}/pending/{action}", method = RequestMethod.PUT)
+    public void approveOrReject(@PathVariable int id, @PathVariable int action){
+        Transfer transfer = currentTransfer.getTransfer(id);
+        if (action == 2) {
+            currentTransfer.approveOrReject(id, action);
+            dao.updateBalances(transfer.getAccount_to(), transfer.getAccount_from(), transfer.getAmount(), transfer.getAmount());
+        } else {
+            currentTransfer.approveOrReject(id, action);
         }
     }
 }

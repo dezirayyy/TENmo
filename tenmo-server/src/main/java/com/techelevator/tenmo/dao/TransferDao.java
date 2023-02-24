@@ -12,5 +12,7 @@ public interface TransferDao {
 
     public List<Transfer> pendingTransfers(int id);
 
+    public void approveOrReject(int id, int action);
+
     Transfer getTransfer(int id);
 }

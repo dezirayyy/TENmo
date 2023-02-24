@@ -136,6 +136,13 @@ public class ConsoleService {
         System.out.println("-------------------------------------------");
     }
 
+    public void approveOrRejectTransfer(){
+        System.out.println("-------------------------------------------");
+        System.out.println("2: Approve");
+        System.out.println("3: Reject");
+        System.out.println("-------------------------------------------");
+    }
+
     public void pause() {
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
