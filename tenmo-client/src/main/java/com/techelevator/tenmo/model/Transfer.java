@@ -28,12 +28,30 @@ public class Transfer {
         return transfer_type_id;
     }
 
+    public String getTransferType(int id) {
+        if (id == 1){
+            return "Request";
+        } else {
+            return "Send";
+        }
+    }
+
     public void setTransfer_type_id(int transfer_type_id) {
         this.transfer_type_id = transfer_type_id;
     }
 
     public int getTransfer_status_id() {
         return transfer_status_id;
+    }
+
+    public String getTransferStatus(int id){
+        if (id == 1){
+            return "Pending";
+        } else if (id == 2){
+            return "Approved";
+        } else {
+            return "Rejected";
+        }
     }
 
     public void setTransfer_status_id(int transfer_status_id) {

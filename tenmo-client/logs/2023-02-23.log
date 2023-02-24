@@ -1,0 +1,15 @@
+2023-02-23T11:09:32.29114 401 : [no body]
+2023-02-23T13:06:19.732786 500 : [{"timestamp":"2023-02-23T21:06:19.670+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; bad SQL grammar [INSERT INTO transfer (transfer_id, transfer_type_id, tr... (422 bytes)]
+2023-02-23T13:08:32.427879 500 : [{"timestamp":"2023-02-23T21:08:32.382+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [INSERT INTO transfer (transfer_id, transfer_type_id, transfer_statu... (424 bytes)]
+2023-02-23T13:11:49.859584 I/O error on POST request for "http://localhost:8080/transfer/1002/send": Unexpected end of file from server; nested exception is java.net.SocketException: Unexpected end of file from server
+2023-02-23T13:13:56.994081 401 : [no body]
+2023-02-23T13:17:29.263041 500 : [{"timestamp":"2023-02-23T21:17:29.211+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [INSERT INTO transfer (transfer_id, transfer_type_id, transfer_statu... (424 bytes)]
+2023-02-23T13:25:28.152035 500 : [{"timestamp":"2023-02-23T21:25:28.116+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [INSERT INTO transfer (transfer_id, transfer_type_id, transfer_statu... (424 bytes)]
+2023-02-23T13:29:35.344264 500 : [{"timestamp":"2023-02-23T21:29:35.282+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [INSERT INTO transfer (transfer_id, transfer_type_id, transfer_statu... (424 bytes)]
+2023-02-23T13:29:54.238032 500 : [{"timestamp":"2023-02-23T21:29:54.204+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [INSERT INTO transfer (transfer_id, transfer_type_id, transfer_statu... (424 bytes)]
+2023-02-23T13:33:11.783154 401 : [no body]
+2023-02-23T13:33:32.566173 I/O error on POST request for "http://localhost:8080/transfer/1002/send": Unexpected end of file from server; nested exception is java.net.SocketException: Unexpected end of file from server
+2023-02-23T13:53:08.894547 500 : [{"timestamp":"2023-02-23T21:53:08.855+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [INSERT INTO transfer (transfer_id, transfer_type_id, transfer_statu... (424 bytes)]
+2023-02-23T14:06:05.131507 500 : [{"timestamp":"2023-02-23T22:06:05.094+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [INSERT INTO transfer (transfer_id, transfer_type_id, transfer_statu... (424 bytes)]
+2023-02-23T14:15:34.590616 400 : [<!doctype html><html lang="en"><head><title>HTTP Status 400 – Bad Request</title><style type="text/css">body {font-family:Tahoma,Arial,sans-serif;} h1, h2, h3, b {color:white;background-color:#525D76;... (435 bytes)]
+2023-02-23T15:27:57.685808 415 : [{"timestamp":"2023-02-23T23:27:57.619+00:00","status":415,"error":"Unsupported Media Type","message":"Content type 'application/x-www-form-urlencoded;charset=UTF-8' not supported","path":"/transfer/1002/send"}]

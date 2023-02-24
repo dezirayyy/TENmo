@@ -2,6 +2,7 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.User;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -43,6 +44,18 @@ public class JdbcAccountDao implements AccountDao {
         }
         return userList;
     }
+
+    public boolean updateBalances(int toId, int fromId, BigDecimal amountTo, BigDecimal amountFrom) {
+        String sql = "UPDATE account SET balance = balance + ? WHERE account_id = ?; " +
+                "UPDATE account SET balance = balance - ? WHERE account_id = ?";
+        try {
+            jdbcTemplate.update(sql, amountTo, toId, amountFrom, fromId);
+        } catch (DataAccessException e) {
+            return false;
+        }
+        return true;
+    }
+
 
     private User mapRowToUser(SqlRowSet rs) {
         User user = new User();

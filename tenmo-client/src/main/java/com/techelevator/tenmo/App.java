@@ -1,8 +1,6 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
@@ -109,16 +107,29 @@ public class App {
         System.out.print(accountService.getBalance(currentUser.getUser().getId()));
 	}
 
-    private void listUsers(){
-        consoleService.listAccounts();
-        User[] userList = accountService.listUsers(currentUser.getUser().getId());
-        for (User user : userList) {
-            System.out.println(user.getId() + "   " + user.getUsername());
-        }
-    }
-
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
+        Account account = transferService.getAccount(currentUser.getUser().getId());
+        Transfer[] transferHistory = transferService.viewTransferHistory(account.getAccount_id());
+        consoleService.transferHistory();
+
+        for (Transfer transfer: transferHistory) {
+            if (transfer.getAccount_from() == account.getAccount_id()){
+
+                System.out.println(transfer.getTransfer_id()+"            To: "+transfer.getAccount_to()+"            $"+transfer.getAmount());
+            } else {
+                System.out.println(transfer.getTransfer_id()+"            From: "+ transfer.getAccount_from()+"          $"+transfer.getAmount());
+            }
+        }
+        int id = consoleService.promptForInt("Please enter transfer ID to view details: ");
+        Transfer transfer = transferService.viewTransferDetails(id);
+        consoleService.transferDetails();
+        System.out.println("ID: "+transfer.getTransfer_id());
+        System.out.println("From: "+transfer.getAccount_from());
+        System.out.println("To: "+transfer.getAccount_to());
+        System.out.println("Type: "+transfer.getTransferType(transfer.getTransfer_type_id()));
+        System.out.println("Status: "+transfer.getTransferStatus(transfer.getTransfer_status_id()));
+        System.out.println("Amount: "+transfer.getAmount());
 
 	}
 
@@ -133,14 +144,25 @@ public class App {
         System.out.println();
         int user = consoleService.promptForUserInfo();
         BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
-        System.out.println(transferService.sendBucks(user, amount));
+        transferService.sendBucks(user, amount);
         System.out.println("You've successfully sent " + amount);
 
     }
 
 	private void requestBucks() {
 		// TODO Auto-generated method stub
-		
+		listUsers();
+        System.out.println();
+        int user = consoleService.promptForUserInfo();
+        BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
 	}
+
+    private void listUsers(){
+        consoleService.listAccounts();
+        User[] userList = accountService.listUsers(currentUser.getUser().getId());
+        for (User user : userList) {
+            System.out.println(user.getId() + "   " + user.getUsername());
+        }
+    }
 
 }

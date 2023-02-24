@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/account/")
+@RequestMapping("/account")
 public class AccountController {
 
     private AccountDao dao;
@@ -24,7 +24,7 @@ public class AccountController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping (path = "{id}", method = RequestMethod.GET)
+    @RequestMapping (path = "/{id}", method = RequestMethod.GET)
     public Account get(@PathVariable int id){
         Account account = dao.get(id);
         if (account == null) {
@@ -35,7 +35,7 @@ public class AccountController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping (path = "list/{id}", method = RequestMethod.GET)
+    @RequestMapping (path = "/list/{id}", method = RequestMethod.GET)
     public User[] list (@PathVariable int id){
         List<User> accountList = dao.listUsers(id);
         if (accountList == null) {

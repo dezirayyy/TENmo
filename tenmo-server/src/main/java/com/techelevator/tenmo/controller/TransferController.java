@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/transfer")
@@ -34,10 +35,33 @@ public class TransferController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(path = "/{id}/send", method = RequestMethod.POST)
-    public void sendBucks(@PathVariable int id, @Valid @RequestBody Transfer transfer) {
-        if(!currentTransfer.add(transfer)){
+    @RequestMapping(path = "/send", method = RequestMethod.POST)
+    public void sendBucks(@Valid @RequestBody Transfer transfer) {
+        if(!currentTransfer.sendBucks(transfer)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Transfer failed");
+        }
+        dao.updateBalances(transfer.getAccount_to(), transfer.getAccount_from(),transfer.getAmount(),transfer.getAmount());
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(path = "/{id}/history", method = RequestMethod.GET)
+    public Transfer[] viewTransferHistory(@PathVariable int id) {
+        List<Transfer> list = currentTransfer.listTransfers(id);
+        if (list == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transfers Not Found");
+        } else {
+            return list.toArray(new Transfer[list.size()]);
+        }
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(path = "/details/{id}", method = RequestMethod.GET)
+    public Transfer viewTransferDetails(@PathVariable int id){
+        Transfer transfer = currentTransfer.getTransfer(id);
+        if (transfer == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transfer Not Found");
+        } else {
+            return transfer;
         }
     }
 }

@@ -81,7 +81,7 @@ public class ConsoleService {
     }
 
     public int promptForUserInfo(){
-        System.out.println("Enter ID of user you are sending to (0 to cancel):");
+        System.out.println("Enter ID of user you are sending to/ requesting from:");
         while (true) {
             try {
                 return scanner.nextInt();
@@ -100,6 +100,19 @@ public class ConsoleService {
         System.out.println("Users");
         System.out.println();
         System.out.println("ID      Name");
+        System.out.println("-------------------------------------------");
+    }
+
+    public void transferHistory(){
+        System.out.println("-------------------------------------------");
+        System.out.println("Transfers                       ");
+        System.out.println("ID              From/To             Amount");
+        System.out.println("-------------------------------------------");
+    }
+
+    public void transferDetails(){
+        System.out.println("-------------------------------------------");
+        System.out.println("Transfer details");
         System.out.println("-------------------------------------------");
     }
 
