@@ -22,7 +22,6 @@ public class AccountService {
         this.baseUrl = url;
     }
 
-    // gets user by account id
     public User getUserByAccountId(int id){
         User user = null;
         try {
@@ -38,8 +37,6 @@ public class AccountService {
             return user;
         }
     }
-
-    // returns a list of user ids and usernames, not including the current user
     public User[] listUsers(int id){
         User[] userList = null;
         try {
@@ -50,13 +47,12 @@ public class AccountService {
             BasicLogger.log(e.getMessage());
         }
         if (userList == null) {
-            throw new NullPointerException("No Accounts found");
+            throw new NullPointerException("No Users found");
         } else {
             return userList;
         }
     }
 
-    // gets account by user ud
     public Account getAccountByUserId(int id){
         Account account = null;
         try {

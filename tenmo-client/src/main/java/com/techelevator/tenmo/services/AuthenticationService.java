@@ -32,7 +32,11 @@ public class AuthenticationService {
         } catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());
         }
-        return user;
+        if (user == null){
+            throw new NullPointerException("");
+        } else {
+            return user;
+        }
     }
 
     public boolean register(UserCredentials credentials) {
@@ -44,7 +48,7 @@ public class AuthenticationService {
         } catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());
         }
-        return success;
+            return success;
     }
 
     private HttpEntity<UserCredentials> createCredentialsEntity(UserCredentials credentials) {

@@ -2,8 +2,10 @@ package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.TransferDao;
+import com.techelevator.tenmo.dao.UserDao;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -41,6 +43,7 @@ public class TransferController {
         if(!currentTransfer.save(transfer)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Transfer failed");
         }
+        dao.updateBalances(transfer.getAccount_to(), transfer.getAccount_from(), transfer.getAmount(), transfer.getAmount());
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -48,19 +51,6 @@ public class TransferController {
     public void requestBucks(@Valid @RequestBody Transfer transfer) {
         if(!currentTransfer.save(transfer)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Request failed");
-        }
-    }
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(path = "/request/response", method = RequestMethod.POST)
-    public void requestResponse(@Valid @RequestBody Transfer transfer){
-        if (transfer.getTransfer_status_id() == 2){
-            dao.updateBalances(transfer.getAccount_to(), transfer.getAccount_from(),transfer.getAmount(),transfer.getAmount());
-            transfer.setTransfer_status_id(2);
-            currentTransfer.save(transfer);
-        } else {
-            transfer.setTransfer_status_id(3);
-            currentTransfer.save(transfer);
         }
     }
 

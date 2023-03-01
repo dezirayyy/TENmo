@@ -5,6 +5,7 @@ import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 import com.techelevator.tenmo.services.TransferService;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 
 import java.math.BigDecimal;
 
@@ -55,7 +56,7 @@ public class App {
     }
 
     private void handleRegister() {
-        System.out.println("Please register a new user account");
+        System.out.println("Please register a new user account: ");
         UserCredentials credentials = consoleService.promptForCredentials();
         if (authenticationService.register(credentials)) {
             System.out.println("Registration successful. You can now login.");
@@ -69,7 +70,7 @@ public class App {
         currentUser = authenticationService.login(credentials);
         if (currentUser == null) {
             consoleService.printErrorMessage();
-        } else {
+        }  else {
             accountService.setCurrentUser(currentUser);
             transferService.setCurrentUser(currentUser);
         }
@@ -91,7 +92,7 @@ public class App {
             } else if (menuSelection == 5) {
                 requestBucks();
             } else if (menuSelection == 6) {
-                listUsers();
+
             } else if (menuSelection == 0) {
                 continue;
             } else {
@@ -118,18 +119,22 @@ public class App {
         System.out.println();
         int id = consoleService.promptForInt("Please enter transfer ID to view details (0 to cancel): ");
         if (id == 0) {
-            System.out.println("Action Cancelled");
+
         } else {
             Transfer transfer = transferService.viewTransferDetails(id);
-            consoleService.transferDetails();
-            String transferType = transfer.getTransferTypeString(transfer.getTransfer_type_id());
-            String transferStatus = transfer.getTransferStatusString(transfer.getTransfer_status_id());
-            System.out.println("ID: " + transfer.getTransfer_id());
-            System.out.println("From: " + accountService.getUserByAccountId(transfer.getAccount_from()).getUsername());
-            System.out.println("To: " + accountService.getUserByAccountId(transfer.getAccount_to()).getUsername());
-            System.out.println("Type: " + transferType);
-            System.out.println("Status: " + transferStatus);
-            System.out.println("Amount: " + transfer.getAmount());
+           if (transfer.getTransfer_id() == 0) {
+               System.out.println("No transfer found");
+           } else {
+               consoleService.transferDetails();
+               String transferType = transfer.getTransferTypeString(transfer.getTransfer_type_id());
+               String transferStatus = transfer.getTransferStatusString(transfer.getTransfer_status_id());
+               System.out.println("ID: " + transfer.getTransfer_id());
+               System.out.println("From: " + accountService.getUserByAccountId(transfer.getAccount_from()).getUsername());
+               System.out.println("To: " + accountService.getUserByAccountId(transfer.getAccount_to()).getUsername());
+               System.out.println("Type: " + transferType);
+               System.out.println("Status: " + transferStatus);
+               System.out.println("Amount: " + transfer.getAmount());
+           }
         }
     }
 
@@ -146,15 +151,23 @@ public class App {
         System.out.println();
         int id = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
         if (id == 0) {
-            System.out.println("Action Cancelled");
+            System.out.print("");
         } else {
-            consoleService.approveOrRejectTransfer();
-            int action = consoleService.promptForInt("Please choose an option: ");
-            transferService.approveOrReject(id, action);
-            if (action == 2) {
-                System.out.println("You've approved the request. Amount has been sent");
+            if (transferService.viewTransferDetails(id).getTransfer_id() == 0) {
+                System.out.println("No transfer found");
             } else {
-                System.out.println("You've rejected the request.");
+                consoleService.approveOrRejectTransfer();
+                int action = consoleService.promptForInt("Please choose an option: ");
+                boolean success = transferService.approveOrReject(id, action);
+                if (success) {
+                    if (action == 2 && success) {
+                        System.out.println("You've approved the request. "+transferService.viewTransferDetails(id).getAmount()+" has been sent: "+accountService.getUserByAccountId(transferService.viewTransferDetails(id).getAccount_to()).getUsername());
+                    } else  if (action == 3 && success) {
+                        System.out.println("You've rejected the request");
+                    } else {
+                        System.out.println("Not an option");
+                    }
+                }
             }
         }
     }
@@ -166,6 +179,8 @@ public class App {
             System.out.println("Transfer Cancelled");
         } else if (user == currentUser.getUser().getId()) {
             System.out.println("Can't send bucks to yourself");
+        } else if (transferService.getAccountByUserId(user) == null) {
+            System.out.println("No user found");
         } else {
             BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
             if (amount.compareTo(BigDecimal.ZERO) < 0) {
@@ -185,13 +200,15 @@ public class App {
         System.out.println();
         int user = consoleService.promptForUserRequest();
         if (user == 0) {
-            System.out.println("Transfer Cancelled");
+            System.out.println("Transfer cancelled");
         } else if (user == currentUser.getUser().getId()) {
             System.out.println("Can't request bucks from yourself");
+        } else if(transferService.getAccountByUserId(user) == null) {
+            System.out.println("No user found");
         } else {
             BigDecimal amount = consoleService.promptForBigDecimal("Enter amount: ");
             if (amount.compareTo(BigDecimal.ZERO) < 0) {
-                System.out.println("Can't send negative or zero amount");
+                System.out.println("Can't request negative or zero amount");
             } else {
                 transferService.requestBucks(user, amount);
                 System.out.println("Requested " + amount + " bucks from: " + accountService.getUserByAccountId(accountService.getAccountByUserId(user).getAccount_id()).getUsername());

@@ -25,6 +25,22 @@ public class TransferService {
         this.baseUrl = url;
     }
 
+    public User getUserByAccountId(int id){
+        User user = null;
+        try {
+            ResponseEntity<User> response =
+                    restTemplate.exchange(baseUrl + "user/" + id, HttpMethod.GET, makeAuthEntity(), User.class);
+            user = response.getBody();
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        if (user == null) {
+            throw new NullPointerException("No User found");
+        } else {
+            return user;
+        }
+    }
+
     public Account getAccountByUserId(int id){
         Account account = null;
         try {
@@ -33,16 +49,13 @@ public class TransferService {
         } catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());
         }
-        if (account == null) {
-            throw new NullPointerException("Account Not Found");
-        } else {
-            return account;
-        }
+        return account;
     }
 
     public boolean sendBucks(int id, BigDecimal amount) {
         Account toAccount = getAccountByUserId(id);
         Account fromAccount = getAccountByUserId(currentUser.getUser().getId());
+
 
         boolean sufficientFunds = false;
         int result = fromAccount.getBalance().compareTo(amount);
@@ -65,6 +78,7 @@ public class TransferService {
             }
             return sufficientFunds = true;
         }
+
     }
 
     public void requestBucks(int id, BigDecimal amount) {
@@ -88,56 +102,64 @@ public class TransferService {
             }
     }
 
-        public Transfer[] viewTransferHistory (int id){
-            Transfer[] transferList = new Transfer[]{};
-            try {
-                ResponseEntity<Transfer[]> response =
-                        restTemplate.exchange(baseUrl + "/" + id + "/history", HttpMethod.GET, makeAuthEntity(), Transfer[].class);
-                transferList = response.getBody();
-            } catch (RestClientResponseException | ResourceAccessException e) {
-                BasicLogger.log(e.getMessage());
-            }
-            if (transferList == null) {
-                throw new NullPointerException("No Transfers found");
-            } else {
-                return transferList;
-            }
+    public Transfer[] viewTransferHistory (int id){
+        Transfer[] transferList = new Transfer[]{};
+        try {
+            ResponseEntity<Transfer[]> response =
+                    restTemplate.exchange(baseUrl + "/" + id + "/history", HttpMethod.GET, makeAuthEntity(), Transfer[].class);
+            transferList = response.getBody();
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
         }
-
-        public Transfer[] viewPendingTransfer(int id) {
-            Transfer[] pendingTransfers = new Transfer[]{};
-            try {
-                ResponseEntity<Transfer[]> response =
-                        restTemplate.exchange(baseUrl + "/" + id + "/pending", HttpMethod.GET, makeAuthEntity(), Transfer[].class);
-                pendingTransfers = response.getBody();
-            } catch (RestClientResponseException | ResourceAccessException e) {
-                BasicLogger.log(e.getMessage());
-            }
-            if (pendingTransfers == null) {
-                throw new NullPointerException("No Transfers found");
-            } else {
-                return pendingTransfers;
-            }
+        if (transferList == null) {
+            throw new NullPointerException("No Transfers found");
+        } else {
+            return transferList;
         }
+    }
 
-        public boolean approveOrReject(int id, int action){
-            boolean success = false;
-            Transfer transfer = new Transfer(){};
+    public Transfer[] viewPendingTransfer(int id) {
+        Transfer[] pendingTransfers = new Transfer[]{};
+        try {
+            ResponseEntity<Transfer[]> response =
+                    restTemplate.exchange(baseUrl + "/" + id + "/pending", HttpMethod.GET, makeAuthEntity(), Transfer[].class);
+            pendingTransfers = response.getBody();
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        if (pendingTransfers == null) {
+            throw new NullPointerException("No Transfers found");
+        } else {
+            return pendingTransfers;
+        }
+    }
 
+    public boolean approveOrReject(int id, int action){
+        Transfer transfer = viewTransferDetails(id);
+        Account account = getAccountByUserId(transfer.getAccount_from() - 1000);
+        boolean success = true;
+
+        if (account.getBalance().compareTo(transfer.getAmount()) < 1) success = false;
+
+        if (success) {
             try {
                 ResponseEntity<Transfer> response =
-                        restTemplate.exchange(baseUrl +"/" + id + "/pending/" + action, HttpMethod.PUT, makeAuthEntity(), Transfer.class);
+                        restTemplate.exchange(baseUrl + "/" + id + "/pending/" + action, HttpMethod.PUT, makeAuthEntity(), Transfer.class);
                 transfer = response.getBody();
             } catch (RestClientResponseException | ResourceAccessException e) {
                 BasicLogger.log(e.getMessage());
             }
-            return success;
+        } else {
+            System.out.println("Insufficient funds");
         }
+        return success;
+    }
+
 
 
 
     public Transfer viewTransferDetails(int id){
-        Transfer transfer = new Transfer(){};
+        Transfer transfer = null;
         try {
             ResponseEntity<Transfer> response =
                     restTemplate.exchange(baseUrl + "/details/" + id, HttpMethod.GET, makeAuthEntity(), Transfer.class);

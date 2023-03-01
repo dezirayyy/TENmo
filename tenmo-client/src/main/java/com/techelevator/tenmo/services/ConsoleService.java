@@ -4,6 +4,7 @@ package com.techelevator.tenmo.services;
 import com.techelevator.tenmo.model.UserCredentials;
 
 import java.math.BigDecimal;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class ConsoleService {
@@ -85,7 +86,7 @@ public class ConsoleService {
 
         while (true) {
             try {
-                return scanner.nextInt();
+                return Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid number.");
             }
@@ -97,7 +98,7 @@ public class ConsoleService {
 
         while (true) {
             try {
-                return scanner.nextInt();
+                return Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid number.");
             }
