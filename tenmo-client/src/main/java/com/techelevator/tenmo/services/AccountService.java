@@ -22,7 +22,8 @@ public class AccountService {
         this.baseUrl = url;
     }
 
-    public User getUserByAccountId(int id){
+
+    public User getUserByAccountId(int id) {
         User user = null;
         try {
             ResponseEntity<User> response =

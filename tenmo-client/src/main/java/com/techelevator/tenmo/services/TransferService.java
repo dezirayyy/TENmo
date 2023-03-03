@@ -52,7 +52,7 @@ public class TransferService {
         return account;
     }
 
-    public boolean sendBucks(int id, BigDecimal amount) {
+    public boolean sendBucks(int id, BigDecimal amount, String message) {
         Account toAccount = getAccountByUserId(id);
         Account fromAccount = getAccountByUserId(currentUser.getUser().getId());
 
@@ -68,6 +68,7 @@ public class TransferService {
             transfer.setAccount_to(toAccount.getAccount_id());
             transfer.setTransfer_type_id(2);
             transfer.setTransfer_status_id(2);
+            transfer.setMessage(message);
 
             try {
                 HttpEntity<Transfer> entity = makeTransferEntity(transfer);
@@ -81,7 +82,7 @@ public class TransferService {
 
     }
 
-    public void requestBucks(int id, BigDecimal amount) {
+    public void requestBucks(int id, BigDecimal amount, String message) {
         Account fromAccount = getAccountByUserId(id);
         Account toAccount = getAccountByUserId(currentUser.getUser().getId());
 
@@ -92,6 +93,7 @@ public class TransferService {
             transfer.setAccount_to(toAccount.getAccount_id());
             transfer.setTransfer_type_id(1);
             transfer.setTransfer_status_id(1);
+            transfer.setMessage(message);
 
             try {
                 HttpEntity<Transfer> entity = makeTransferEntity(transfer);

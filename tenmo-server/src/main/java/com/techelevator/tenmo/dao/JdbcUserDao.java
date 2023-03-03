@@ -34,13 +34,12 @@ public class JdbcUserDao implements UserDao {
         } catch (NullPointerException | EmptyResultDataAccessException e) {
             throw new UsernameNotFoundException("User " + username + " was not found.");
         }
-
         return userId;
     }
 
     @Override
     public User getUserById(int userId) {
-        String sql = "SELECT user_id, username, password_hash FROM tenmo_user WHERE user_id = ?";
+        String sql = "SELECT user_id, username, password_hash, role FROM tenmo_user WHERE user_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
         if (results.next()) {
             return mapRowToUser(results);

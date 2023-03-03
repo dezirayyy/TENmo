@@ -20,10 +20,10 @@ public class JdbcTransferDao implements TransferDao {
 
     public boolean save(Transfer transfer) {
         String sql =
-                "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                        "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id;";
+                "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount, message) " +
+                        "VALUES (?, ?, ?, ?, ?, ?) RETURNING transfer_id;";
                  try {
-                     int id = jdbcTemplate.queryForObject(sql, Integer.class, transfer.getTransfer_type_id(), transfer.getTransfer_status_id(), transfer.getAccount_from(), transfer.getAccount_to(), transfer.getAmount());
+                     int id = jdbcTemplate.queryForObject(sql, Integer.class, transfer.getTransfer_type_id(), transfer.getTransfer_status_id(), transfer.getAccount_from(), transfer.getAccount_to(), transfer.getAmount(), transfer.getMessage());
                      transfer.setTransfer_id(id);
                  } catch (DataAccessException e) {
                      return false;
@@ -83,6 +83,7 @@ public class JdbcTransferDao implements TransferDao {
         transfer.setAccount_to(rs.getInt("account_to"));
         transfer.setAccount_from(rs.getInt("account_from"));
         transfer.setAmount(rs.getBigDecimal("amount"));
+        transfer.setMessage(rs.getString("message"));
         return transfer;
     }
 

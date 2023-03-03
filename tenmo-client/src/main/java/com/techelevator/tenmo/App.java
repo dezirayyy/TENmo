@@ -79,7 +79,7 @@ public class App {
     private void mainMenu() {
         int menuSelection = -1;
         while (menuSelection != 0) {
-            consoleService.printMainMenu();
+            consoleService.printMainMenu(currentUser);
             menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
             if (menuSelection == 1) {
                 viewCurrentBalance();
@@ -103,8 +103,8 @@ public class App {
     }
 
 	private void viewCurrentBalance() {
-        consoleService.currentBalance();
-        System.out.print(accountService.getAccountByUserId(currentUser.getUser().getId()).getBalance());
+        consoleService.currentBalance(accountService.getAccountByUserId(currentUser.getUser().getId()).getBalance());
+        // System.out.println("accountService.getAccountByUserId(currentUser.getUser().getId()).getBalance()");
 	}
 
     private void viewTransferHistory() {
@@ -134,6 +134,7 @@ public class App {
                System.out.println("Type: " + transferType);
                System.out.println("Status: " + transferStatus);
                System.out.println("Amount: " + transfer.getAmount());
+               System.out.println("Note: " + transfer.getMessage());
            }
         }
     }
@@ -146,7 +147,8 @@ public class App {
         for (Transfer transfer: transferHistory) {
             String fromOrTo = transfer.getAccount_from() == account.getAccount_id() ? "To: " : "From: ";
             String username = accountService.getUserByAccountId(fromOrTo.equals("To: ") ? transfer.getAccount_to() : transfer.getAccount_from()).getUsername();
-            System.out.println(transfer.getTransfer_id() + "            " + fromOrTo + username + "              $" + transfer.getAmount());
+            String message = transfer.getMessage();
+            System.out.println(transfer.getTransfer_id() + "        " + fromOrTo + username + "       $" + transfer.getAmount() + "          " + transfer.getMessage());
         }
         System.out.println();
         int id = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
@@ -161,7 +163,23 @@ public class App {
                 boolean success = transferService.approveOrReject(id, action);
                 if (success) {
                     if (action == 2 && success) {
-                        System.out.println("You've approved the request. "+transferService.viewTransferDetails(id).getAmount()+" has been sent: "+accountService.getUserByAccountId(transferService.viewTransferDetails(id).getAccount_to()).getUsername());
+                        System.out.println("_____________________________________");
+                        System.out.println("|                                     |");
+                        System.out.println("|        You've approved the request! |");
+                        System.out.println("|                                     |");
+                        System.out.printf("|         %-28s|\n", "Amount: $" + transferService.viewTransferDetails(id).getAmount());
+                        System.out.printf("|         %-28s|\n", "Sent to: " + accountService.getUserByAccountId(transferService.viewTransferDetails(id).getAccount_to()).getUsername());
+                        System.out.printf("|         %-28s|\n", "Note: " + transferService.viewTransferDetails(id).getMessage());
+                        System.out.println("|                                     |");
+                        System.out.println("|       Thank you for                 |");
+                        System.out.println("|       moooving your money with us!  |");
+                        System.out.println("|                                     |");
+                        System.out.println("|            \\    ^__^                |");
+                        System.out.println("|             \\  (oo)\\_______         |");
+                        System.out.println("|                (__)\\       )\\/      |");
+                        System.out.println("|                    ||----w |        |");
+                        System.out.println("|                    ||     ||        |");
+                        System.out.println("|_____________________________________|\n");
                     } else  if (action == 3 && success) {
                         System.out.println("You've rejected the request");
                     } else {
@@ -186,8 +204,25 @@ public class App {
             if (amount.compareTo(BigDecimal.ZERO) < 0) {
                 System.out.println("Can't send negative or zero amount");
             } else {
-                if (transferService.sendBucks(user, amount)) {
-                    System.out.println("Transfer successful: " + amount + " bucks sent to: " + accountService.getUserByAccountId(accountService.getAccountByUserId(user).getAccount_id()).getUsername());
+                String message = consoleService.promptForString("Enter note: ");
+                if (transferService.sendBucks(user, amount, message)) {
+                    System.out.println("_____________________________________");
+                    System.out.println("|                                     |");
+                    System.out.println("|        Transfer Successful!         |");
+                    System.out.println("|                                     |");
+                    System.out.printf("|         %-28s|\n", "Amount: $" + amount);
+                    System.out.printf("|         %-28s|\n", "Sent to: " + accountService.getUserByAccountId(accountService.getAccountByUserId(user).getAccount_id()).getUsername());
+                    System.out.printf("|         %-28s|\n", "Note: " + message);
+                    System.out.println("|                                     |");
+                    System.out.println("|       Thank you for                 |");
+                    System.out.println("|       moooving your money with us!  |");
+                    System.out.println("|                                     |");
+                    System.out.println("|            \\    ^__^                |");
+                    System.out.println("|             \\  (oo)\\_______         |");
+                    System.out.println("|                (__)\\       )\\/      |");
+                    System.out.println("|                    ||----w |        |");
+                    System.out.println("|                    ||     ||        |");
+                    System.out.println("|_____________________________________|\n");
                 } else {
                     System.out.println("Insufficient funds");
                 }
@@ -210,8 +245,22 @@ public class App {
             if (amount.compareTo(BigDecimal.ZERO) < 0) {
                 System.out.println("Can't request negative or zero amount");
             } else {
-                transferService.requestBucks(user, amount);
-                System.out.println("Requested " + amount + " bucks from: " + accountService.getUserByAccountId(accountService.getAccountByUserId(user).getAccount_id()).getUsername());
+                String message = consoleService.promptForString("Enter note: ");
+                transferService.requestBucks(user, amount, message);
+                System.out.println("_____________________________________");
+                System.out.println("|                                     |");
+                System.out.println("|        Request Successful!          |");
+                System.out.println("|                                     |");
+                System.out.printf("|         %-28s|\n", "Requested: $" + amount);
+                System.out.printf("|         %-28s|\n", "From: " + accountService.getUserByAccountId(accountService.getAccountByUserId(user).getAccount_id()).getUsername());
+                System.out.printf("|         %-28s|\n", "Note: " + message);
+                System.out.println("|                                     |");
+                System.out.println("|            \\    ^__^                |");
+                System.out.println("|             \\  (oo)\\_______         |");
+                System.out.println("|                (__)\\       )\\/      |");
+                System.out.println("|                    ||----w |        |");
+                System.out.println("|                    ||     ||        |");
+                System.out.println("|_____________________________________|\n");
             }
         }
 	}

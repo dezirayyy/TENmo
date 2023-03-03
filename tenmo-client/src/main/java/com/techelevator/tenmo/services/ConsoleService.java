@@ -1,6 +1,8 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 
 import java.math.BigDecimal;
@@ -23,10 +25,20 @@ public class ConsoleService {
     }
 
     public void printGreeting() {
-        System.out.println("*********************");
-        System.out.println("* Welcome to TEnmo! *");
-        System.out.println("*********************");
+        System.out.println("___________________________");
+        System.out.println("/ Welcome to                \\");
+        System.out.println("\\      TENMO!                /");
+        System.out.println(" \\     Money made easy!     /");
+        System.out.println("  ---------------------------");
+        System.out.println("       \\   ^__^");
+        System.out.println("        \\  (oo)\\_______");
+        System.out.println("           (__)\\       )\\/ ");
+        System.out.println("               ||----w |");
+        System.out.println("               ||     ||");
     }
+
+
+
 
     public void printLoginMenu() {
         System.out.println();
@@ -36,17 +48,22 @@ public class ConsoleService {
         System.out.println();
     }
 
-    public void printMainMenu() {
+    public void printMainMenu(AuthenticatedUser user) {
         System.out.println();
-        System.out.println("1: View your current balance");
-        System.out.println("2: View your past transfers");
-        System.out.println("3: View your pending requests");
-        System.out.println("4: Send TE bucks");
-        System.out.println("5: Request TE bucks");
-        System.out.println("6: List users");
-        System.out.println("0: Exit");
+        System.out.println(" _______________________________________________________");
+        System.out.println("| Welcome back " + user.getUser().getUsername() + "!                                  |");
+        System.out.println("|                                                      |");
+        System.out.println("| 1: Check your stash                                  |");
+        System.out.println("| 2: See where your money has been moooving            |");
+        System.out.println("| 3: View your pending requests                        |");
+        System.out.println("| 4: Send TE bucks                                     |");
+        System.out.println("| 5: Request TE bucks                                  |");
+        System.out.println("| 6: List users                                        |");
+        System.out.println("| 0: Exit                                              |");
+        System.out.println("|______________________________________________________|");
         System.out.println();
     }
+
 
     public UserCredentials promptForCredentials() {
         String username = promptForString("Username: ");
@@ -105,8 +122,10 @@ public class ConsoleService {
         }
     }
 
-    public void currentBalance(){
-        System.out.print("Your current balance is: " );
+    public void currentBalance(BigDecimal balance){
+        System.out.println("====================================");
+        System.out.printf("| %-18s $%-10.2f |\n", "Current Balance: ", balance);
+        System.out.println("====================================");
     }
 
     public void listAccounts() {
@@ -131,10 +150,10 @@ public class ConsoleService {
     }
 
     public void pendingTransfer(){
-        System.out.println("-------------------------------------------");
+        System.out.println("---------------------------------------------------");
         System.out.println("Pending Transfers");
-        System.out.println("ID                  To             Amount");
-        System.out.println("-------------------------------------------");
+        System.out.println("ID          To              Amount          Note");
+        System.out.println("---------------------------------------------------");
     }
 
     public void approveOrRejectTransfer(){

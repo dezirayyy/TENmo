@@ -16,6 +16,8 @@ public class Transfer {
 
     private BigDecimal amount;
 
+    private String message;
+
     public int getTransfer_id() {
         return transfer_id;
     }
@@ -80,5 +82,13 @@ public class Transfer {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
